@@ -25,7 +25,7 @@ jobs:
       - name: Build
         run: go build -o go-app
 
-      - name Test 
+      - name: Test 
         run: go test ./...
   code-quality:
     runs-on: ubuntu-latest
