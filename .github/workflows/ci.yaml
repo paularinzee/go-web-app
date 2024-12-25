@@ -29,7 +29,8 @@ jobs:
         run: go test ./...
   code-quality:
     runs-on: ubuntu-latest
-      steps:
+
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -60,10 +61,10 @@ jobs:
     needs: push
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.TOKEN }}
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.TOKEN }}
       
       - name : Update tag in Helm chart
         run: |
