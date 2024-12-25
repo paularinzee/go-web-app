@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  [workflow_dispatch]
+  # push:
+  #   branches:
+  #     - main
+  # parths-ignore:
+  #   - 'README.md'
+  #   - 'helm/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go 1.22
+        uses: docker/setup-go@v2
+        with:
+          go-version: 1.22
+      
+      - name: Build
+        run: go build -o go-app
+
+      - name Test 
+        run: go test ./...
+  code-quality:
+    runs-on: ubuntu-latest
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.56.2
+  
+  push:
+    runs-on: ubuntu-latest
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/go-app:${{github.run_id}}
+
+  update-tag-in-helm-chart:
+    runs-on: ubuntu-latest
+
+    needs: push
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.TOKEN }}
+      
+      - name : Update tag in Helm chart
+        run: |
+          sed -1 's/tag: .*/tag: "${{github.run_id}}"/' helm/go-app-chart/values.yaml
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.email "arinzennajipaul@gmail.com"
+          git config --global user.name  "paularinzee"
+          git add helm/go-app-chart/values.yaml
+          git commit -m "update tag in helm chart"
+          git push
+
+
+
+     
+      
