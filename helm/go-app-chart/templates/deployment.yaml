@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: go-app
-        image: paularinze/go-app:{{.values.image.tag}}
+        image: paularinze/go-app:{{ .Values.image.tag }}
         ports:
         - containerPort: 8080
         

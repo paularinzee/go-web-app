@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: go-app
-        image: paularinze/go-app:latest # Replace with your image
+        image: paularinze/go-app:12495299616 # Replace with your image
         ports:
         - containerPort: 8080
         
